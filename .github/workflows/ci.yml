@@ -17,8 +17,9 @@ jobs:
         python-version: ["3.10", "3.13"]
 
     env:
+      # Keep the API tests off any proxy the runner may have configured.
+      # Env keys are case-insensitive in workflows, so this must appear once.
       NO_PROXY: 127.0.0.1,localhost
-      no_proxy: 127.0.0.1,localhost
 
     steps:
       - uses: actions/checkout@v4
