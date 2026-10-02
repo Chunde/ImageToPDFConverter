@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image to PDF Converter</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h7l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13 2v5h5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 13h8M7 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <div>
+      <h1>Image to PDF Converter</h1>
+      <p>Arrange passport images into one PDF</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button id="btn-open-folder" class="btn btn-primary" type="button">
+      <span class="ico">📂</span> Open folder
+    </button>
+    <button id="btn-add-folder" class="btn" type="button" title="Pick a folder with the browser's own picker">Add folder…</button>
+    <button id="btn-add-files" class="btn" type="button">Add images…</button>
+    <button id="btn-open-browser" class="btn" type="button">Browse in app</button>
+    <button id="btn-clear" class="btn btn-ghost" type="button">Clear</button>
+  </div>
+</header>
+
+<input id="file-input" type="file" accept="image/*" multiple hidden>
+<input id="folder-input" type="file" webkitdirectory directory multiple hidden>
+
+<main class="layout">
+  <aside class="panel browser-panel" id="browser-panel" hidden>
+    <div class="panel-head">
+      <strong>Folder browser</strong>
+      <button id="browser-close" class="icon-btn" title="Close" type="button">✕</button>
+    </div>
+    <div class="browser-path" id="browser-path"></div>
+    <div class="browser-roots" id="browser-roots"></div>
+    <p class="browser-note" id="browser-note" hidden>
+      Quick-access shortcuts are hidden because this page was opened with <code>?demo=1</code>.
+    </p>
+    <div class="browser-list" id="browser-list"></div>
+    <div class="browser-foot">
+      <label class="check"><input type="checkbox" id="browser-recursive" checked> include subfolders</label>
+      <button id="browser-add" class="btn btn-primary btn-sm" type="button" disabled>Add all shown</button>
+    </div>
+  </aside>
+
+  <section class="panel workspace">
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <label for="sort-key">Sort</label>
+        <select id="sort-key">
+          <option value="name">by name (A → Z)</option>
+          <option value="name-desc">by name (Z → A)</option>
+          <option value="mtime">by modified date</option>
+          <option value="size">by file size</option>
+          <option value="manual">manual (drag order)</option>
+        </select>
+        <button id="btn-sort" class="btn btn-sm" type="button">Apply</button>
+      </div>
+      <div class="toolbar-group">
+        <button id="btn-reverse" class="btn btn-sm" type="button">Reverse</button>
+        <button id="btn-shuffle" class="btn btn-sm" type="button">Shuffle</button>
+        <button id="btn-auto-orient" class="btn btn-sm" type="button" title="Rotate each page to match its image shape">Auto-rotate 90°</button>
+      </div>
+      <div class="toolbar-group grow right">
+        <span class="count" id="count-label">0 pages</span>
+        <button id="btn-export" class="btn btn-export" type="button" disabled>Export PDF</button>
+      </div>
+    </div>
+
+    <div class="hint" id="hint">
+      <strong>Get started:</strong> click <em>Open folder</em> to pick a folder of images, or drag image files
+      straight onto this area. Then drag the thumbnails to reorder pages, or use <em>Sort</em>.
+    </div>
+
+    <div class="grid" id="grid" aria-label="Page order"></div>
+  </section>
+
+  <aside class="panel settings-panel">
+    <div class="panel-head"><strong>PDF settings</strong></div>
+    <div class="settings-body">
+      <label>Page size
+        <select id="page-size">
+          <option value="a4" selected>A4</option>
+          <option value="letter">Letter</option>
+          <option value="a5">A5</option>
+          <option value="a3">A3</option>
+          <option value="auto">Fit to each image</option>
+        </select>
+      </label>
+      <label>Orientation
+        <select id="page-orientation">
+          <option value="auto" selected>Match each image</option>
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </label>
+      <label>Image fit
+        <select id="page-fit">
+          <option value="contain" selected>Fit inside page</option>
+          <option value="cover">Fill page (crop)</option>
+          <option value="stretch">Stretch to page</option>
+          <option value="actual">Original size</option>
+        </select>
+      </label>
+      <label>Margin <span class="value" id="margin-value">0 mm</span>
+        <input type="range" id="page-margin" min="0" max="30" step="1" value="0">
+      </label>
+      <label>Quality <span class="value" id="quality-value">92</span>
+        <input type="range" id="page-quality" min="50" max="100" step="1" value="92">
+      </label>
+      <label>File name
+        <input type="text" id="file-name" value="scanned-pages" spellcheck="false">
+      </label>
+      <div class="meta" id="last-result"></div>
+    </div>
+  </aside>
+</main>
+
+<div class="drop-overlay" id="drop-overlay" hidden><div>Drop images to add them to the end</div></div>
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" id="lightbox-close" type="button">✕</button>
+  <img id="lightbox-img" alt="">
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+<div class="toasts" id="toasts"></div>
+<footer class="statusbar">
+  <span id="status-text">Ready.</span>
+  <span class="builds" id="build-status"></span>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

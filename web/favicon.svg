@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Image to PDF">
+  <rect width="64" height="64" rx="14" fill="#2f6bff"/>
+  <path d="M22 12h14l10 10v30a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4Z" fill="#ffffff"/>
+  <path d="M36 12l10 10H36V12Z" fill="#bcd0ff"/>
+  <rect x="24" y="32" width="16" height="3" rx="1.5" fill="#2f6bff"/>
+  <rect x="24" y="39" width="16" height="3" rx="1.5" fill="#2f6bff"/>
+  <rect x="24" y="46" width="9" height="3" rx="1.5" fill="#2f6bff"/>
+</svg>

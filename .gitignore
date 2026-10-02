@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Locally generated test artefacts
+testdata/ui/
+testdata/*.pdf
